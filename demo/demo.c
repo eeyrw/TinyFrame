@@ -12,7 +12,7 @@
 #include <winsock2.h>
 #include <Ws2tcpip.h>
 #pragma comment(lib,"Ws2_32")
-#define ssize_t size_t
+#define ssize_t int
 #define close closesocket
 #else
 #include <sched.h>
