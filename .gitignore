@@ -38,3 +38,12 @@ tf.bin
 
 .idea/
 
+/demo/vsproject/.vs
+/demo/vsproject/Release
+/demo/vsproject/Debug
+/demo/vsproject/socket_demo_client/Debug
+/demo/vsproject/socket_demo_client/Release
+/demo/vsproject/socket_demo_client/socket_demo_client.vcxproj.user
+/demo/vsproject/socket_demo_server/Release
+/demo/vsproject/socket_demo_server/socket_demo_server.vcxproj.user
+/demo/vsproject/socket_demo_server/Debug
