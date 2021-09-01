@@ -50,12 +50,11 @@ static void usleep(unsigned long usec)
  */
 void demo_disconn(void)
 {
+	conn_disband = true;
+	if (sockfd >= 0) close(sockfd);
 #ifdef _MSC_VER
 	WSACleanup();
 #endif // _MSC_VER
-
-	conn_disband = true;
-	if (sockfd >= 0) close(sockfd);
 }
 
 /**
@@ -71,7 +70,7 @@ void TF_WriteImpl(TinyFrame* tf, const uint8_t* buff, uint32_t len)
 	usleep(1000);
 
 	if (sockfd != -1) {
-		send(sockfd, buff, len,0);
+		send(sockfd, buff, len, 0);
 	}
 	else {
 		printf("\nNo peer!\n");
@@ -124,8 +123,8 @@ static int demo_client(void* unused)
 	printf("\n Child Process \n");
 
 	while ((n = recv(sockfd, recvBuff, sizeof(recvBuff) - 1, 0)) > 0) {
-		printf("\033[36m--- RX %ld bytes ---\033[0m\n", n);
-		dumpFrame(recvBuff, (size_t)n);
+		// printf("\033[36m--- RX %ld bytes ---\033[0m\n", n);
+		// dumpFrame(recvBuff, (size_t)n);
 		TF_Accept(demo_tf, recvBuff, (size_t)n);
 	}
 	return 0;
@@ -179,9 +178,9 @@ static int demo_server(void* unused)
 		printf("\nClient connected\n");
 		conn_disband = false;
 
-		while ((n = recv(sockfd, recvBuff, sizeof(recvBuff) - 1,0)) > 0 && !conn_disband) {
-			printf("\033[36m--- RX %ld bytes ---\033[0m\n", n);
-			dumpFrame(recvBuff, n);
+		while ((n = recv(sockfd, recvBuff, sizeof(recvBuff) - 1, 0)) > 0 && !conn_disband) {
+			// printf("\033[36m--- RX %ld bytes ---\033[0m\n", n);
+			// dumpFrame(recvBuff, n);
 			TF_Accept(demo_tf, recvBuff, (size_t)n);
 		}
 
