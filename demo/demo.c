@@ -27,7 +27,7 @@
 
 volatile int sockfd = -1;
 volatile bool conn_disband = false;
-
+HANDLE g_Mutex;
 TinyFrame* demo_tf;
 
 
@@ -98,11 +98,20 @@ static int demo_client(void* unused)
 
 	printf("\n--- STARTING CLIENT! ---\n");
 
+#ifdef _MSC_VER
+	WaitForSingleObject(g_Mutex, INFINITE);
+#endif // _MSC_VER
+
 	memset(recvBuff, '0', sizeof(recvBuff));
 	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		printf("\n Error : Could not create socket \n");
 		return false;
 	}
+
+#ifdef _MSC_VER
+	ReleaseMutex(g_Mutex);
+#endif // _MSC_VER
+
 
 	memset(&serv_addr, '0', sizeof(serv_addr));
 
@@ -150,6 +159,10 @@ static int demo_server(void* unused)
 	int option;
 
 	printf("\n--- STARTING SERVER! ---\n");
+#ifdef _MSC_VER
+	WaitForSingleObject(g_Mutex, INFINITE);
+#endif // _MSC_VER
+
 
 	listenfd = socket(AF_INET, SOCK_STREAM, 0);
 	memset(&serv_addr, '0', sizeof(serv_addr));
@@ -171,6 +184,9 @@ static int demo_server(void* unused)
 		return 1;
 	}
 
+#ifdef _MSC_VER
+	ReleaseMutex(g_Mutex);
+#endif // _MSC_VER
 	while (1) {
 		printf("\nWaiting for client...\n");
 		sockfd = accept(listenfd, (struct sockaddr*)NULL, NULL);
@@ -238,6 +254,9 @@ void demo_init(TF_Peer peer)
 
 	HANDLE hThread;
 	DWORD  threadId;
+
+	g_Mutex= CreateMutex(NULL, false, NULL);  // 创建互斥量，初始化为触发状态
+
 	if (peer == TF_MASTER) {
 		retc = CreateThread(NULL, 0, demo_client, 0, 0, &threadId);
 	}
@@ -272,6 +291,10 @@ void demo_init(TF_Peer peer)
 		return;
 	}
 #endif
-
+#ifdef _MSC_VER
+	WaitForSingleObject(g_Mutex, INFINITE);
+	ReleaseMutex(g_Mutex);
+	CloseHandle(g_Mutex);
+#endif // _MSC_VER
 	printf("Thread started\n");
 }
